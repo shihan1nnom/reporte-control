@@ -14,6 +14,9 @@ $report= new PluginReportsAutoReport();
 new PluginReportsDateIntervalCriteria($report, '`glpi_tickets`.`date`', __('Opening date'));
 $category = new PluginReportsTicketCategoryCriteria($report);
 $category->setSqlField("`glpi_tickets`.`itilcategories_id`");
+$estado = new PluginReportsDropdownCriteria($report, "id", "glpi_plugin_fields_seleccionfielddropdowns", "Estados");
+$estado->setSqlField("`glpi_plugin_fields_ticketrepacions`.`plugin_fields_seleccionfielddropdowns_id`");
+
 
 // se necesita el formulario de criterios de visualizacion
 $report->displayCriteriasForm();
@@ -43,6 +46,7 @@ if ($report->criteriasValidated()) {
         new PluginReportsColumn('fecha2', __('Fecha [F2]')),
         new PluginReportsColumn('trm', __('TRM')),
         new PluginReportsColumn('total', __('Total')),
+        new PluginReportsColumn('estado', __('Estado')),
         
     ));
     /* Ajustar nombres de atributos segun corresponda */
@@ -66,6 +70,7 @@ if ($report->criteriasValidated()) {
         `glpi_plugin_fields_ticketreparacions`.`fechafacturatwofield` AS fecha2,
         `glpi_plugin_fields_ticketreparacions`.`trmfield` AS trm,
         `glpi_plugin_fields_ticketreparacions`.`totalfield` AS total
+        `glpi_plugin_fields_seleccionfielddropdowns`.`name` AS estado
         FROM `glpi_tickets`
         LEFT JOIN `glpi_locations`
         ON `glpi_locations`.`id` = `glpi_tickets`.`locations_id`
@@ -77,6 +82,8 @@ if ($report->criteriasValidated()) {
         ON (`glpi_items_tickets`.`tickets_id` = `glpi_tickets`.`id` AND `glpi_items_tickets`.`itemtype` = 'Peripheral')
         LEFT JOIN `glpi_peripherals`
         ON (`glpi_peripherals`.`id` = `glpi_items_tickets`.`items_id`)
+        LEFT JOIN `glpi_plugin_fields_seleccionfielddropdowns`
+        ON (`glpi_plugin_fields_seleccionfielddropdowns`.`id` = `glpi_plugin_fields_ticketrepacions`.`plugin_fields_seleccionfielddropdowns_id`)
         WHERE NOT `glpi_tickets`.`is_deleted`
         ".$report->addSqlCriteriasRestriction().$report->getOrderBy('date');
     
